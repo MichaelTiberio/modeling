@@ -2,24 +2,37 @@
 
 import csv
 
-def write_data(filename, frames, precision = None):
-	if isinstance(precision, int):
-		format = '{{:.{}}}'.format(precision + 1)
+def write_data(filename, frames, dt, dx, dy, precision = None):
+	have_precision = isinstance(precision, int)
+	if have_precision:
+		format = '{{:.{}e}}'.format(precision + 1)
 	else:
-		format = '{}'
+		format = '{}e'
 
 	with open(filename, 'w', newline='') as csvfile:
 		writer = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_NONE)
-		writer.writerows([['mctField', 'version=0.1'],
-		                  ['grid_source=CALCULATED'],
-		                  ['algorithm=cartesian2d', 'x_count=' + str(len(frames[0])), 'y_count=' + str(len(frames[0][0])), 'dx=0.1', 'dy=0.1'],
-		                  ['format=csv', 'data_type=float1', 'precision=', 'time_steps=' + str(len(frames)), 'dt=0.01'],
-		                  []]) # blank line
+		
+		line1 = [ 'mctField      ',
+		          '00.00.01',
+		          'TEXT  ' ]
+		line2 = [ 'grid_source=CALCULATED' ]
+		line3 = [ 'algorithm=cartesian2d',
+		          'x_count={}'.format(len(frames[0])),
+		          'y_count={}'.format(len(frames[0][0])),
+		          'dx={}'.format(dx),
+		          'dy={}'.format(dy) ]
+		line4 = [ 'format=csv',
+		          'data_type=float1',
+		          'time_steps=' + str(len(frames)),
+		          'dt={}'.format(dt) ]
+
+		if have_precision:
+			line4.insert(2, 'precision={}'.format(precision))
+
+		writer.writerows([line1, line2, line3, line4 , []]) # blank line at end
 
 		for frame in frames:
-			writer.writerow([('{:.3}'.format(y)) for x in frame for y in x])
 			writer.writerow([(format.format(y)) for x in frame for y in x])
-			writer.writerow('')
 
 if __name__ == '__main__':
 	import numpy as np
@@ -29,14 +42,13 @@ if __name__ == '__main__':
 		m = (x*10.0+y*100.0+1)*np.pi
 		e = ((t-2.5))
 		r = np.power(m, e)
-		print('m: ', m, '  e: ', e, '  r: ', r)
 		return r
 
 	#data = [[[x for y in range(3)] for x in range(4)] for t in range(5)]
 	#data = [[[y for y in range(3)] for x in range(4)] for t in range(5)]
 	#data = [[[t for y in range(3)] for x in range(4)] for t in range(5)]
 	data = [[[f(t, x, y) for y in range(3)] for x in range(4)] for t in range(5)]
-	write_data(CSV_FILE, np.array(data, dtype=float), precision=2)
+	write_data(CSV_FILE, np.array(data, dtype=float), dt = 0.01, dx = 0.15, dy = 0.2, precision = 3)
 
 	# Ensure that the array is in the correct form
 	#for t in range(5):

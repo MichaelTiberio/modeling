@@ -1,0 +1,77 @@
+Copyright (c) 2018  Michael C. Tiberio  All rights reserved.
+
+                                      ===========================================
+                                                 mctField Specfication
+                                      ===========================================
+
+Simple file format for field data files. Field data will specify a value (scalar, 2d vector, or 3d vector) for each
+point in the specified grid. Since each point gets a value, the grid data can be implied by ordering the output data in
+the same way that the grid is ordered. For data that does not assign a value to the entire grid, use the mctSparse
+format.
+
+The file headers are plain text and can be parsed as CSV files, though the data format allows for binary data to be
+specified
+
+The first line must be terminated in a CrLf, otherwise the format is line ending agnostic.
+
+Version 00.00.01
+
+File format:
+	1: {file_type},{version},{file_format}
+	2: grid_source={grid_source}
+	3: {grid_parameters}
+	4: format={data_format},data_type={data_type},[precision={precision},]time_steps={time_steps},dt={dt}
+	5:
+	n: {data}
+
+1: File Format Line - Metadata about the format of this file. It is a fixed length of 32 characters (including the
+terminating CrLf). This is intended to make it easy to read the file in either a text format or a binary format (once a
+binary format is specified).
+    {file_type} : Length: 14 characters. The string "mctField      " indicating that this file contains plot data for a
+    	field, meaning that data will be supplied for each point in the grid.
+	{version} : Length: 8 charactersThe string "00.00.01" indicating the version of the file format to follow.
+	{file_format} : Length: 6 characters. Must be one of the following:
+		"TEXT  " : The contents of the file after the first line will be in text format.
+
+2: Grid Source - How to load the grid data.
+	{grid_source} : May be either of the two following options:
+		- "CALCULATED" : Indicating that the grid can be calculated using the paramerters found in
+		                 {grid_parameters}.
+		- {grid_name} : Indicating the name of the grid data to load. The grid may be further
+		                 parameterized by teh {grid_parameters} line.
+
+3: Grid Parameters - A list of grid specific parameters that may be used to parameterize the grid. For example, a
+cartesian grid may expose delta-x and delta-y parameters to describe the physical spacing between columns and rows,
+respectively, of grid points. This way a cartesian grid can be designed that can be reused for multiple problems
+across different scales. The exact format of {grid_parameters} is grid specific and specified by the grid_source.
+
+4: Plot Data Metadata
+	{data_format} : The format of the contents of {data}. May be any of the following options:
+		"csv" : The data is in CSV format.
+	{data_type} : The type of data provided for each point. May be any of the following options:
+		"float1" : One dimensional floating point value. Each grid point has a single value associted with it in the
+			{data} section.
+		"float2" : Two dimensional floating point value. Each grid point has two values associated with it in the {data}
+			section.
+		"float3" : Three dimensional floating point value. Each grid point has three values associated with it in the
+			{data} section.
+	{precision} : [Optional] The number of decimal places to which the floating point values are rounded before writing
+		to file.
+	{time_steps} : An integer that describes the number of time steps (rows) in the {data} section.
+	{dt} : The time interval between time steps.
+
+5: Blank Line
+
+n: Plot Data - The data that describes the field to plot. Each row is an ordered list of data points that corresponds to
+the ordered list of grid points for the grid specified by {grid_source}. Each row corresponds to a single frame. The
+format of each datum is specified by {data_format}. The number of rows corresponds to {time_steps}.
+
+
+2D Cartesian Grid Source
+	{grid_source} : "CALCULATED"
+	{grid_parameters} : algorithm={algorithm},x_count={x_count},y_count={y_count},dx={dx},dy={dy}
+		{algorithm} : The string "cartesian2d" indicating that this field data is on a two dimensional, cartesian grid.
+		{x_count} : An integer value indicating the number of colunns.
+		{y_count} : An integer value indicating the number of rows.
+		{dx} : A floating point value indicating the distance between colunns of grid points.
+		{dy} : A floating point value indicating the distance between rows of grid points.
