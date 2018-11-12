@@ -16,7 +16,7 @@ Y = 100
 T = 500
 
 # Fully qualified output file for writing the movie to.
-PATH       = r'C:\src\plotter\output'
+PATH       = r'C:\src\modeling\output'
 MOVIE_FILE = PATH + r'\movie.mp4'
 CSV_FILE   = PATH + r'\data.csv'
 
