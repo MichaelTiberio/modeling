@@ -1,13 +1,15 @@
 Copyright (c) 2018  Michael C. Tiberio  All rights reserved.
 
                                       ===========================================
-                                                 mctField Specfication
+                                                mctField Specification
                                       ===========================================
 
 Simple file format for field data files. Field data will specify a value (scalar, 2d vector, or 3d vector) for each
 point in the specified grid. Since each point gets a value, the grid data can be implied by ordering the output data in
 the same way that the grid is ordered. For data that does not assign a value to the entire grid, use the mctSparse
 format.
+
+This file format is intended to be the output file commonly used to send field data to image processor for rendering.
 
 The file headers are plain text and can be parsed as CSV files, though the data format allows for binary data to be
 specified
@@ -29,16 +31,16 @@ terminating CrLf). This is intended to make it easy to read the file in either a
 binary format is specified).
     {file_type} : Length: 14 characters. The string "mctField      " indicating that this file contains plot data for a
     	field, meaning that data will be supplied for each point in the grid.
-	{version} : Length: 8 charactersThe string "00.00.01" indicating the version of the file format to follow.
+	{version} : Length: 8 characters. The string "00.00.01" indicating the version of the file format to follow.
 	{file_format} : Length: 6 characters. Must be one of the following:
 		"TEXT  " : The contents of the file after the first line will be in text format.
 
 2: Grid Source - How to load the grid data.
 	{grid_source} : May be either of the two following options:
-		- "CALCULATED" : Indicating that the grid can be calculated using the paramerters found in
+		- "CALCULATED" : Indicating that the grid can be calculated using the parameters found in
 		                 {grid_parameters}.
 		- {grid_name} : Indicating the name of the grid data to load. The grid may be further
-		                 parameterized by teh {grid_parameters} line.
+		                 parameterized by the {grid_parameters} line.
 
 3: Grid Parameters - A list of grid specific parameters that may be used to parameterize the grid. For example, a
 cartesian grid may expose delta-x and delta-y parameters to describe the physical spacing between columns and rows,
@@ -49,7 +51,7 @@ across different scales. The exact format of {grid_parameters} is grid specific 
 	{data_format} : The format of the contents of {data}. May be any of the following options:
 		"csv" : The data is in CSV format.
 	{data_type} : The type of data provided for each point. May be any of the following options:
-		"float1" : One dimensional floating point value. Each grid point has a single value associted with it in the
+		"float1" : One dimensional floating point value. Each grid point has a single value associated with it in the
 			{data} section.
 		"float2" : Two dimensional floating point value. Each grid point has two values associated with it in the {data}
 			section.
@@ -71,7 +73,7 @@ format of each datum is specified by {data_format}. The number of rows correspon
 	{grid_source} : "CALCULATED"
 	{grid_parameters} : algorithm={algorithm},x_count={x_count},y_count={y_count},dx={dx},dy={dy}
 		{algorithm} : The string "cartesian2d" indicating that this field data is on a two dimensional, cartesian grid.
-		{x_count} : An integer value indicating the number of colunns.
+		{x_count} : An integer value indicating the number of columns.
 		{y_count} : An integer value indicating the number of rows.
-		{dx} : A floating point value indicating the distance between colunns of grid points.
+		{dx} : A floating point value indicating the distance between columns of grid points.
 		{dy} : A floating point value indicating the distance between rows of grid points.
