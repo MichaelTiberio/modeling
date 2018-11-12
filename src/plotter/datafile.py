@@ -2,6 +2,11 @@
 
 import csv
 
+# Only supported file type at this time is mctField, version 00.00.01, CALCULATED, cartesian2d, text, csv, with scalar
+#   floats as the data values.
+# time_steps, x_count, and y_count are taken from the dimensions of frames (as frames[t][x][y]).
+# dt, dx, and dy must be specified in the call and are passed through to the file. They have no effect on the behavior
+#   of this method.
 def write_data(filename, frames, dt, dx, dy, precision = None):
 	have_precision = isinstance(precision, int)
 	if have_precision:
@@ -23,7 +28,7 @@ def write_data(filename, frames, dt, dx, dy, precision = None):
 		          'dy={}'.format(dy) ]
 		line4 = [ 'format=csv',
 		          'data_type=float1',
-		          'time_steps=' + str(len(frames)),
+		          'time_steps={}'.format(len(frames)),
 		          'dt={}'.format(dt) ]
 
 		if have_precision:
