@@ -81,3 +81,4 @@ if __name__ == '__main__':
 	#main('movie', 'anim')
 	#main('movie', 'file')
 	datafile.write_data(CSV_FILE, np.array(build_movie_frames(), dtype=float))
+ 
